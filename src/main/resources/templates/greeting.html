@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Greeting</title>
+</head>
+<body>
+<!--
+  VULNERABLE (CWE-79): th:utext renders the "name" model attribute without HTML-escaping,
+  unlike th:text which would encode it safely. Use th:text unless raw HTML is explicitly
+  required and the input has been sanitized first.
+-->
+<h1 th:utext="'Hello, ' + ${name} + '!'">Hello, friend!</h1>
+</body>
+</html>
