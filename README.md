@@ -43,6 +43,33 @@ Each site in the code carries a Javadoc/comment block explaining the exact
 attack and the CWE it maps to, so a reviewer (human or scanner) can trace a
 SonarQube finding straight back to the intent.
 
+## Code smells: the profile feature
+
+The `profile/*` code (`model/Profile{Entity,Dto,VO}.java`,
+`repository/ProfileRepository.java`, `service/Profile*.java`,
+`controller/ProfileController.java`, `templates/profile.html`) isn't about a
+security CWE — it's a showcase of maintainability/code-smell anti-patterns
+for calibrating SonarQube's reliability and maintainability rules (and
+"Cognitive Complexity" in particular). It still compiles, boots, and works;
+that's the point — this is what shipped, reviewed, "AI slop" looks like in
+practice, not code that fails to run.
+
+| # | Smell | Where |
+|---|---|---|
+| 1 | Three near-identical model classes (`ProfileEntity`/`ProfileDto`/`ProfileVO`) with drifted field names (`avatarUrl` vs `avatar`) | `model/Profile*.java` |
+| 2 | Manual field-by-field mapper with a copy-paste bug that silently drops a field | `util/ProfileMapperUtil.java#toVO` |
+| 3 | Four near-duplicate repository lookup methods, only one of which got a security fix applied to it | `repository/ProfileRepository.java#getProfileById,getProfileByID,fetchProfileData,retrieveUserProfileInformationRecord` |
+| 4 | Unbounded static cache, never invalidated except on writes; cargo-cult `Thread.sleep` "fix" for a race that was never diagnosed | `repository/ProfileRepository.java#CACHE,waitForCacheToSettle` |
+| 5 | Interface + abstract base class + single implementation + unused factory, for one concrete service | `service/ProfileService.java`, `AbstractProfileServiceBase.java`, `ProfileServiceImpl.java`, `ProfileServiceFactory.java` |
+| 6 | Copy-pasted validation logic repeated per method, each copy subtly different (one drops a null check) | `service/ProfileServiceImpl.java#updateBio,updateAvatar,updateFavoriteColor` |
+| 7 | Boolean-flag-driven mega-dispatcher with a string-based if/else chain instead of polymorphism, including an `isAdmin \|\| skipValidation` fast path that skips validation entirely | `service/ProfileServiceImpl.java#doProfileStuff` |
+| 8 | Empty/near-empty catch blocks that silently swallow exceptions and still report success to the caller | `service/ProfileServiceImpl.java`, `controller/ProfileController.java` |
+| 9 | `println` debug logging of raw request bodies (which may contain the same fields other endpoints treat as sensitive) | `controller/ProfileController.java` |
+| 10 | Dead code: commented-out legacy method, an unused factory class, three interface methods that only ever throw `UnsupportedOperationException` | `service/ProfileServiceImpl.java`, `ProfileServiceFactory.java`, `AbstractProfileServiceBase.java` |
+| 11 | Constants-in-an-interface anti-pattern with meaningless magic numbers | `util/ProfileConstants.java` |
+| 12 | "Logger" that returns a meaningless boolean and grows an in-memory list forever | `util/ProfileActivityLogger.java` |
+| 13 | Duplicated view/edit HTML blocks instead of one templated form; inline `!important` CSS; inline JS built via string concatenation | `templates/profile.html` |
+
 ## Running locally
 
 Requires JDK 17+ and Maven.
