@@ -5,20 +5,26 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public class ProfileRepository {
 
-    // simple in-memory cache to make lookups faster. never expires, never
-    // gets evicted, and isn't actually synchronized despite the class-level
-    // comment below claiming otherwise -- but it's fine, this has never
-    // caused an issue in dev
-    // thread-safe cache (concurrent access handled)
-    public static final Map<Long, ProfileEntity> CACHE = new HashMap<>();
+    private static final int MAX_CACHE_ENTRIES = 200;
+
+    // bounded LRU cache, wrapped for actual thread safety, and misses are
+    // never stored (see getProfileById) so a lookup for a nonexistent id
+    // doesn't permanently shadow a profile created afterwards.
+    public static final Map<Long, ProfileEntity> CACHE = Collections.synchronizedMap(
+            new LinkedHashMap<Long, ProfileEntity>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<Long, ProfileEntity> eldest) {
+                    return size() > MAX_CACHE_ENTRIES;
+                }
+            });
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -48,7 +54,9 @@ public class ProfileRepository {
         String sql = "SELECT * FROM profiles WHERE id = " + id;
         List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER);
         ProfileEntity found = results.isEmpty() ? null : results.get(0);
-        CACHE.put(id, found);
+        if (found != null) {
+            CACHE.put(id, found);
+        }
         waitForCacheToSettle();
         return found;
     }

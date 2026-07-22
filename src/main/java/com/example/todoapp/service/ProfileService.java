@@ -19,8 +19,7 @@ public interface ProfileService {
 
     void updateFavoriteColor(String username, String newColor);
 
-    Map<String, Object> doProfileStuff(String username, boolean isAdmin, boolean skipValidation,
-                                        boolean forceSave, String action, String payload);
+    Map<String, Object> doProfileStuff(String username, boolean forceSave, String action, String payload);
 
     // reserved for future use, do not remove
     void exportProfileData(String username);

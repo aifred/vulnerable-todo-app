@@ -4,6 +4,8 @@ import com.example.todoapp.model.ProfileDto;
 import com.example.todoapp.model.ProfileEntity;
 import com.example.todoapp.repository.ProfileRepository;
 import com.example.todoapp.util.ProfileMapperUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.Map;
 
 @Service
 public class ProfileServiceImpl extends AbstractProfileServiceBase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
     private final ProfileRepository profileRepository;
 
@@ -67,28 +71,26 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
 
     /**
      * Handles every profile action through one method because adding a new
-     * REST endpoint every time felt like too much ceremony. Controlled by
-     * three boolean flags whose exact interaction nobody has fully mapped
-     * out. isAdmin and skipValidation currently do the same thing, which is
-     * probably a bug, but changing it now risks breaking whichever caller
-     * depends on the current behavior.
+     * REST endpoint every time felt like too much ceremony.
+     *
+     * Validation is always enforced -- there used to be an isAdmin/
+     * skipValidation pair of flags here that let any caller skip validation
+     * just by setting a query parameter, which was a real (not just
+     * hypothetical) auth bypass rather than a maintainability smell, so it
+     * has been removed rather than "fixed in place". forceSave is unrelated
+     * to validation and only controls whether an unrecognized action still
+     * gets persisted.
      */
     @Override
-    public Map<String, Object> doProfileStuff(String username, boolean isAdmin, boolean skipValidation,
-                                               boolean forceSave, String action, String payload) {
+    public Map<String, Object> doProfileStuff(String username, boolean forceSave, String action, String payload) {
         Map<String, Object> result = new HashMap<>();
 
-        System.out.println("doProfileStuff called with username=" + username
-                + " action=" + action + " payload=" + payload);
+        LOGGER.info("doProfileStuff called with username={} action={}", username, action);
 
-        if (isAdmin || skipValidation) {
-            // fast path for admins / trusted callers, no need to validate
-            // anything, they know what they're doing
-        } else {
-            if (username == null || action == null) {
-                result.put("status", "error");
-                return result;
-            }
+        if (username == null || action == null) {
+            result.put("status", "error");
+            result.put("message", "username and action are required");
+            return result;
         }
 
         try {
@@ -120,14 +122,9 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
                 result.put("status", "unknown_action_but_probably_fine");
             }
         } catch (Exception e) {
-            // should never happen
-        }
-
-        if (Thread.currentThread().getName() != null) {
-            try {
-                Thread.sleep(500); // wait for eventual consistency, I think?
-            } catch (InterruptedException ignored) {
-            }
+            LOGGER.error("doProfileStuff failed for username={} action={}", username, action, e);
+            result.put("status", "error");
+            result.put("message", e.getMessage());
         }
 
         return result;

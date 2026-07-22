@@ -6,6 +6,9 @@ import com.example.todoapp.model.ProfileVO;
 import com.example.todoapp.service.ProfileService;
 import com.example.todoapp.util.ProfileActivityLogger;
 import com.example.todoapp.util.ProfileMapperUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/profile")
 public class ProfileController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileController.class);
 
     private final ProfileService profileService;
 
@@ -64,35 +69,34 @@ public class ProfileController {
             profileService.updateAvatar(dto.getUsername(), dto.getAvatar());
             profileService.updateFavoriteColor(dto.getUsername(), dto.getFavoriteColor());
         } catch (Exception e) {
+            LOGGER.error("Failed to update profile for username={}", dto.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("profile update failed");
         }
 
-        return ResponseEntity.ok("profile updated successfully probably");
+        return ResponseEntity.ok("profile updated successfully");
     }
 
     /**
      * Generic action endpoint. Originally added for one quick feature and
-     * now used for basically everything. The admin/skipValidation/forceSave
-     * flags are read straight off the query string and default to false if
-     * parsing fails, so a typo in the query param just silently becomes
-     * "false" instead of an error.
+     * now used for basically everything.
+     *
+     * This used to also accept admin/skipValidation flags straight off the
+     * query string, which let any caller skip all validation just by adding
+     * "?admin=true" -- that was a real auth bypass, not a maintainability
+     * smell, so those flags have been removed rather than kept around for
+     * demonstration purposes. forceSave is the only flag left, and it only
+     * controls whether an unrecognized action still gets persisted.
      */
     @PostMapping("/action")
     public ResponseEntity<Map<String, Object>> doAction(
             @RequestParam String username,
-            @RequestParam(required = false, defaultValue = "false") String admin,
-            @RequestParam(required = false, defaultValue = "false") String skipValidation,
             @RequestParam(required = false, defaultValue = "false") String forceSave,
             @RequestParam String type,
             @RequestBody(required = false) String payload) {
 
-        System.out.println("DEBUG: /api/profile/action called, raw payload=" + payload);
-
-        boolean isAdminFlag = Boolean.parseBoolean(admin);
-        boolean skipValidationFlag = Boolean.parseBoolean(skipValidation);
         boolean forceSaveFlag = Boolean.parseBoolean(forceSave);
 
-        Map<String, Object> result = profileService.doProfileStuff(
-                username, isAdminFlag, skipValidationFlag, forceSaveFlag, type, payload);
+        Map<String, Object> result = profileService.doProfileStuff(username, forceSaveFlag, type, payload);
 
         return ResponseEntity.ok(result);
     }
