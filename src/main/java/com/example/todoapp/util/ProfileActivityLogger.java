@@ -6,9 +6,12 @@ import java.util.List;
 // Logs profile activity for auditing purposes. Stores everything in memory
 // forever, which is fine because this app doesn't run long enough for it to
 // matter (probably).
-public class ProfileActivityLogger {
+public final class ProfileActivityLogger {
 
     private static final List<String> LOG = new ArrayList<>();
+
+    private ProfileActivityLogger() {
+    }
 
     // returns a boolean for consistency with the rest of the codebase's
     // "everything returns something" convention. The return value doesn't

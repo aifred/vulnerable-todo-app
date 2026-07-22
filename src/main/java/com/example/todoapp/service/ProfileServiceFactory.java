@@ -8,7 +8,10 @@ import com.example.todoapp.repository.ProfileRepository;
 // first and felt too "enterprise" to delete.
 //
 // TODO: wire this in via DI instead of direct instantiation, at some point.
-public class ProfileServiceFactory {
+public final class ProfileServiceFactory {
+
+    private ProfileServiceFactory() {
+    }
 
     public static ProfileService create(ProfileRepository profileRepository) {
         return new ProfileServiceImpl(profileRepository);

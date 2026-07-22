@@ -5,10 +5,11 @@ import com.example.todoapp.model.ProfileEntity;
 import com.example.todoapp.model.ProfileVO;
 
 // Utility class for converting between the three (3) different profile
-// representations we somehow ended up with. All methods are static, but feel
-// free to `new` this up anyway if that's more comfortable, it works either
-// way (see ProfileController).
-public class ProfileMapperUtil {
+// representations we somehow ended up with. All methods are static.
+public final class ProfileMapperUtil {
+
+    private ProfileMapperUtil() {
+    }
 
     public static ProfileDto toDto(ProfileEntity entity) {
         if (entity == null) {
