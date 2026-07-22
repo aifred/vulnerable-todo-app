@@ -83,27 +83,17 @@ mvn clean verify sonar:sonar \
   -Dsonar.token=<your-token>
 ```
 
-### 3. CI: GitHub Actions with a quality gate
+### 3. CI
 
-`.github/workflows/build-and-sonar.yml` builds the project, runs tests with
-JaCoCo coverage, and runs the Sonar Maven plugin with
-`-Dsonar.qualitygate.wait=true`, which makes the scanner poll the SonarQube
-server for the Quality Gate result and **fail the pipeline (non-zero exit)
-if the gate fails** — no separate polling action or webhook configuration
-required.
-
-Configure two repository secrets (**Settings → Secrets and variables →
-Actions**):
-
-| Secret | Value |
-|---|---|
-| `SONAR_TOKEN` | A SonarQube/SonarCloud project or user analysis token |
-| `SONAR_HOST_URL` | Your SonarQube server URL (e.g. `https://sonarcloud.io` or your self-hosted URL) |
+`.github/workflows/build.yml` only builds the project and runs tests with
+JaCoCo coverage — it does not call SonarQube. Run the `sonar:sonar` command
+above locally (or wire it into CI yourself) against whichever SonarQube
+server/token you're using.
 
 Given the density of intentional findings in this repo, expect the default
-Quality Gate to fail the first analysis — that's the point: it demonstrates
-the gate actually blocking a real (if intentionally seeded) set of security
-issues.
+Quality Gate to fail the first analysis if you do run it — that's the point:
+it demonstrates the gate actually blocking a real (if intentionally seeded)
+set of security issues.
 
 ## Project layout
 
