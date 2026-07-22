@@ -43,6 +43,33 @@ Each site in the code carries a Javadoc/comment block explaining the exact
 attack and the CWE it maps to, so a reviewer (human or scanner) can trace a
 SonarQube finding straight back to the intent.
 
+## Code smells: the profile feature
+
+The `profile/*` code (`model/Profile{Entity,Dto,VO}.java`,
+`repository/ProfileRepository.java`, `service/Profile*.java`,
+`controller/ProfileController.java`, `templates/profile.html`) isn't about a
+security CWE — it's a showcase of maintainability/code-smell anti-patterns
+for calibrating SonarQube's reliability and maintainability rules (and
+"Cognitive Complexity" in particular). It still compiles, boots, and works;
+that's the point — this is what shipped, reviewed, "AI slop" looks like in
+practice, not code that fails to run.
+
+| # | Smell | Where |
+|---|---|---|
+| 1 | Three near-identical model classes (`ProfileEntity`/`ProfileDto`/`ProfileVO`) with drifted field names (`avatarUrl` vs `avatar`) | `model/Profile*.java` |
+| 2 | Four near-duplicate repository lookup methods implementing the same query | `repository/ProfileRepository.java#getProfileById,getProfileByID,fetchProfileData,retrieveUserProfileInformationRecord` |
+| 3 | Cargo-cult `Thread.sleep` "fix" for a race that was never diagnosed, left in place after the cache it guarded was fixed | `repository/ProfileRepository.java#waitForCacheToSettle` |
+| 4 | Interface + abstract base class + single implementation + unused factory, for one concrete service | `service/ProfileService.java`, `AbstractProfileServiceBase.java`, `ProfileServiceImpl.java`, `ProfileServiceFactory.java` |
+| 5 | Copy-pasted validation logic repeated per method, each copy subtly different (one drops a null check) | `service/ProfileServiceImpl.java#updateBio,updateAvatar,updateFavoriteColor` |
+| 6 | String-based if/else dispatcher instead of polymorphism for routing one of five actions | `service/ProfileServiceImpl.java#doProfileStuff` |
+| 7 | `println` debug logging of raw request bodies (which may contain the same fields other endpoints treat as sensitive) | `controller/ProfileController.java`, `service/ProfileServiceImpl.java` |
+| 8 | Dead code: an unused factory class, three interface methods that only ever throw `UnsupportedOperationException` | `ProfileServiceFactory.java`, `AbstractProfileServiceBase.java` |
+| 9 | Constants-in-an-interface anti-pattern with meaningless magic numbers | `util/ProfileConstants.java` |
+| 10 | "Logger" that returns a meaningless boolean and grows an in-memory list forever | `util/ProfileActivityLogger.java` |
+| 11 | Duplicated view/edit HTML blocks instead of one templated form; inline `!important` CSS; inline JS built via string concatenation | `templates/profile.html` |
+
+A few smells from the original version of this feature were fixed after an automated PR review caught them (see PR #1 history): the mapper dropping `avatarUrl`, a client-controlled `admin`/`skipValidation` query parameter that bypassed all validation, empty catch blocks that swallowed exceptions while still reporting success, a SQL-injectable duplicate lookup method, and a cache stored as a mutable `static` field written from instance methods. Those were genuine bugs/vulnerabilities rather than pure maintainability smells, so they were fixed rather than preserved.
+
 ## Running locally
 
 Requires JDK 17+ and Maven.
