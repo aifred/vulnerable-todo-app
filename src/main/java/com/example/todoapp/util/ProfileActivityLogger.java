@@ -11,6 +11,7 @@ public final class ProfileActivityLogger {
     private static final List<String> LOG = new ArrayList<>();
 
     private ProfileActivityLogger() {
+        // utility class, prevent instantiation
     }
 
     // returns a boolean for consistency with the rest of the codebase's

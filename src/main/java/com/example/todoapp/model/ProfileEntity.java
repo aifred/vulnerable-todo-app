@@ -9,8 +9,8 @@ public class ProfileEntity implements Serializable {
     // the id of the profile
     public Long id;
 
-    // TODO: figure out why we also have this, consolidate with id above once we
-    // know which one the frontend team is actually reading from
+    // Still unconsolidated with id above -- nobody has confirmed which one the
+    // frontend team is actually reading from
     public Long legacyId;
 
     private String username;

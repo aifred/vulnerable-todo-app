@@ -73,9 +73,9 @@ public class ProfileRepository {
      * needed it and, for whatever reason, couldn't just call the method
      * above -- so the same query got implemented twice, just without a cache.
      */
-    public ProfileEntity getProfileByID(Long ID) {
+    public ProfileEntity getProfileByIdUncached(Long id) {
         String sql = "SELECT * FROM profiles WHERE id = ?";
-        List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER, ID);
+        List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER, id);
         return results.isEmpty() ? null : results.get(0);
     }
 
@@ -126,8 +126,8 @@ public class ProfileRepository {
     private void waitForCacheToSettle() {
         try {
             Thread.sleep(100);
-        } catch (InterruptedException ignored) {
-            // fine to ignore, this thread doesn't do anything else important
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

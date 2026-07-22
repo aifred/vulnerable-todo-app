@@ -9,6 +9,7 @@ import com.example.todoapp.model.ProfileVO;
 public final class ProfileMapperUtil {
 
     private ProfileMapperUtil() {
+        // utility class, prevent instantiation
     }
 
     public static ProfileDto toDto(ProfileEntity entity) {

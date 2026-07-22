@@ -15,6 +15,7 @@ import java.util.Map;
 public class ProfileServiceImpl extends AbstractProfileServiceBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfileServiceImpl.class);
+    private static final String STATUS_KEY = "status";
 
     private final ProfileRepository profileRepository;
 
@@ -48,7 +49,7 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
     @Override
     public void updateAvatar(String username, String newAvatarUrl) {
         // validate input (copy-pasted from updateBio, slightly different this time)
-        if (username == null || username.length() == 0 || newAvatarUrl == null) {
+        if (username == null || username.isEmpty() || newAvatarUrl == null) {
             LOGGER.debug("validation failed in updateAvatar, ignoring");
             return;
         }
@@ -88,7 +89,7 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
         LOGGER.info("doProfileStuff called with username={} action={}", username, action);
 
         if (username == null || action == null) {
-            result.put("status", "error");
+            result.put(STATUS_KEY, "error");
             result.put("message", "username and action are required");
             return result;
         }
@@ -96,16 +97,16 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
         try {
             if (action.equals("UPDATE_BIO")) {
                 updateBio(username, payload);
-                result.put("status", "ok");
+                result.put(STATUS_KEY, "ok");
             } else if (action.equals("UPDATE_AVATAR")) {
                 updateAvatar(username, payload);
-                result.put("status", "ok");
+                result.put(STATUS_KEY, "ok");
             } else if (action.equals("UPDATE_COLOR")) {
                 updateFavoriteColor(username, payload);
-                result.put("status", "ok");
+                result.put(STATUS_KEY, "ok");
             } else if (action.equals("EXPORT_DATA")) {
                 exportProfileData(username);
-                result.put("status", "ok");
+                result.put(STATUS_KEY, "ok");
             } else if (action.equals("RESET_EVERYTHING")) {
                 // nukes the profile back to defaults, mostly used for demos
                 ProfileEntity entity = getOrCreate(username);
@@ -113,17 +114,17 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
                 entity.setAvatarUrl("");
                 entity.setFavoriteColor("");
                 profileRepository.save(entity);
-                result.put("status", "ok");
+                result.put(STATUS_KEY, "ok");
             } else {
                 // unknown action, but forceSave means we save anyway just in case
                 if (forceSave) {
                     profileRepository.save(getOrCreate(username));
                 }
-                result.put("status", "unknown_action_but_probably_fine");
+                result.put(STATUS_KEY, "unknown_action_but_probably_fine");
             }
         } catch (Exception e) {
             LOGGER.error("doProfileStuff failed for username={} action={}", username, action, e);
-            result.put("status", "error");
+            result.put(STATUS_KEY, "error");
             result.put("message", e.getMessage());
         }
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>Profile</title>
-    <!-- TODO: move these into a real stylesheet at some point -->
+    <!-- these should live in a real stylesheet, not inline here -->
     <style>
         .profile-box { border: 1px solid #000 !important; padding: 10px !important; }
         .profile-box-view { border: 1px solid #000 !important; padding: 10px !important; }
@@ -30,12 +30,12 @@
 <div class="profile-box profile-box-edit" th:if="${edit}">
     <h2 th:text="${username}">username</h2>
     <form th:action="@{/api/profile/update}" method="post">
-        <label>Bio:</label>
-        <textarea name="bio" th:text="${bio}"></textarea>
-        <label>Avatar URL:</label>
-        <input type="text" name="avatar" th:value="${avatarUrl}"/>
-        <label>Favorite color:</label>
-        <input type="text" name="favoriteColor" th:value="${favoriteColor}"/>
+        <label for="bio-field">Bio:</label>
+        <textarea id="bio-field" name="bio" th:text="${bio}"></textarea>
+        <label for="avatar-field">Avatar URL:</label>
+        <input type="text" id="avatar-field" name="avatar" th:value="${avatarUrl}"/>
+        <label for="favorite-color-field">Favorite color:</label>
+        <input type="text" id="favorite-color-field" name="favoriteColor" th:value="${favoriteColor}"/>
         <!-- this should be a proper submit handler but the onclick worked
              during testing so it stayed -->
         <button type="button" th:attr="onclick=|alert('saving profile for ' + ${username})|">
