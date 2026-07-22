@@ -37,7 +37,7 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
     public void updateBio(String username, String newBio) {
         // validate input
         if (username == null || username.equals("") || newBio == null) {
-            System.out.println("validation failed in updateBio, ignoring");
+            LOGGER.debug("validation failed in updateBio, ignoring");
             return;
         }
         ProfileEntity entity = getOrCreate(username);
@@ -49,7 +49,7 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
     public void updateAvatar(String username, String newAvatarUrl) {
         // validate input (copy-pasted from updateBio, slightly different this time)
         if (username == null || username.length() == 0 || newAvatarUrl == null) {
-            System.out.println("validation failed in updateAvatar, ignoring");
+            LOGGER.debug("validation failed in updateAvatar, ignoring");
             return;
         }
         ProfileEntity entity = getOrCreate(username);
@@ -61,7 +61,7 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
     public void updateFavoriteColor(String username, String newColor) {
         // validate input (copy-pasted again, this copy forgot to check newColor for null)
         if (username == null || username.trim().isEmpty()) {
-            System.out.println("validation failed in updateFavoriteColor, ignoring");
+            LOGGER.debug("validation failed in updateFavoriteColor, ignoring");
             return;
         }
         ProfileEntity entity = getOrCreate(username);

@@ -76,6 +76,6 @@ public class ProfileEntity implements Serializable {
     // British spelling variant that showed up in a PR once and nobody deleted it,
     // so now there are two setters that do the exact same thing
     public void setFavouriteColor(String favoriteColour) {
-        this.favoriteColor = favoriteColour;
+        setFavoriteColor(favoriteColour);
     }
 }

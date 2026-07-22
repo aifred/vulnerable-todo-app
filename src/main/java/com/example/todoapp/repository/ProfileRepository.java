@@ -89,14 +89,12 @@ public class ProfileRepository {
     }
 
     /**
-     * Fetches a profile by username. This is a completely separate method
-     * from fetchProfileData() above because at some point two people
-     * implemented the same thing in different PRs and both got merged.
+     * Fetches a profile by username. This method exists because at some
+     * point two people implemented the same lookup in different PRs and both
+     * got merged -- it just forwards to fetchProfileData() now.
      */
     public ProfileEntity retrieveUserProfileInformationRecord(String username) {
-        String sql = "SELECT * FROM profiles WHERE username = ?";
-        List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER, username);
-        return results.isEmpty() ? null : results.get(0);
+        return fetchProfileData(username);
     }
 
     public ProfileEntity save(ProfileEntity entity) {

@@ -53,8 +53,8 @@ public class ProfileController {
 
     @PostMapping("/update")
     public ResponseEntity<String> updateProfile(@RequestBody ProfileDto dto) {
-        System.out.println("DEBUG: profile update request body = " + dto.getUsername()
-                + " | " + dto.getBio() + " | " + dto.getAvatar() + " | " + dto.getFavoriteColor());
+        LOGGER.debug("profile update request body = {} | {} | {} | {}", dto.getUsername(),
+                dto.getBio(), dto.getAvatar(), dto.getFavoriteColor());
 
         ProfileActivityLogger.log("update:" + dto.getUsername());
 
