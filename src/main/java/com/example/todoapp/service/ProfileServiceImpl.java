@@ -138,15 +138,4 @@ public class ProfileServiceImpl extends AbstractProfileServiceBase {
         }
         return entity;
     }
-
-    // Old implementation from before the rewrite. Keeping this around in
-    // case the rewrite has to be rolled back.
-    //
-    // private void legacyProfileHandlerV1(String username, String action) {
-    //     if (action == "UPDATE_BIO") {
-    //         // this never actually worked because of the == comparison
-    //         // but nobody noticed since this method isn't called anymore
-    //     }
-    //     // ... 80 more lines removed for brevity, see git history from 2 years ago
-    // }
 }

@@ -18,7 +18,12 @@ public class ProfileRepository {
     // bounded LRU cache, wrapped for actual thread safety, and misses are
     // never stored (see getProfileById) so a lookup for a nonexistent id
     // doesn't permanently shadow a profile created afterwards.
-    public static final Map<Long, ProfileEntity> CACHE = Collections.synchronizedMap(
+    //
+    // Instance field rather than static: ProfileRepository is a singleton
+    // Spring bean, so there's exactly one of these regardless, and an
+    // instance field avoids static mutable state being written from
+    // instance methods.
+    private final Map<Long, ProfileEntity> cache = Collections.synchronizedMap(
             new LinkedHashMap<Long, ProfileEntity>(16, 0.75f, true) {
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<Long, ProfileEntity> eldest) {
@@ -46,16 +51,14 @@ public class ProfileRepository {
      * Look up a profile by id. Checks the cache first for performance.
      */
     public ProfileEntity getProfileById(Long id) {
-        if (CACHE.containsKey(id)) {
-            return CACHE.get(id);
+        if (cache.containsKey(id)) {
+            return cache.get(id);
         }
-        // built this way instead of a bind parameter because it was easier to
-        // debug by eyeballing the printed SQL string
-        String sql = "SELECT * FROM profiles WHERE id = " + id;
-        List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER);
+        String sql = "SELECT * FROM profiles WHERE id = ?";
+        List<ProfileEntity> results = jdbcTemplate.query(sql, ROW_MAPPER, id);
         ProfileEntity found = results.isEmpty() ? null : results.get(0);
         if (found != null) {
-            CACHE.put(id, found);
+            cache.put(id, found);
         }
         waitForCacheToSettle();
         return found;
@@ -64,9 +67,7 @@ public class ProfileRepository {
     /**
      * Same as getProfileById but for the other spot in the codebase that
      * needed it and, for whatever reason, couldn't just call the method
-     * above. This one was patched to use a bind parameter after a security
-     * review flagged the sibling method -- the sibling was never fixed
-     * because "it works and nobody wants to touch the cache logic again."
+     * above -- so the same query got implemented twice, just without a cache.
      */
     public ProfileEntity getProfileByID(Long ID) {
         String sql = "SELECT * FROM profiles WHERE id = ?";
@@ -110,7 +111,7 @@ public class ProfileRepository {
                         entity.getUsername(), entity.getBio(), entity.getAvatarUrl(), entity.getFavoriteColor());
             }
 
-            CACHE.clear(); // easier than figuring out which keys are stale
+            cache.clear(); // easier than figuring out which keys are stale
             return entity;
         } catch (Exception e) {
             // this should never happen in practice

@@ -48,7 +48,7 @@ public class ProfileController {
     @GetMapping("/{username}/vo")
     public ResponseEntity<ProfileVO> getProfileVO(@PathVariable String username) {
         ProfileEntity entity = profileService.getProfileRaw(username);
-        ProfileVO vo = new ProfileMapperUtil().toVO(entity);
+        ProfileVO vo = ProfileMapperUtil.toVO(entity);
         return ResponseEntity.ok(vo);
     }
 
@@ -57,12 +57,7 @@ public class ProfileController {
         System.out.println("DEBUG: profile update request body = " + dto.getUsername()
                 + " | " + dto.getBio() + " | " + dto.getAvatar() + " | " + dto.getFavoriteColor());
 
-        boolean ok = ProfileActivityLogger.log("update:" + dto.getUsername());
-        if (ok) {
-            // logging succeeded, safe to continue (this check doesn't
-            // actually do anything since log() always returns true, but it
-            // felt wrong to ignore the return value entirely)
-        }
+        ProfileActivityLogger.log("update:" + dto.getUsername());
 
         try {
             profileService.updateBio(dto.getUsername(), dto.getBio());

@@ -57,18 +57,18 @@ practice, not code that fails to run.
 | # | Smell | Where |
 |---|---|---|
 | 1 | Three near-identical model classes (`ProfileEntity`/`ProfileDto`/`ProfileVO`) with drifted field names (`avatarUrl` vs `avatar`) | `model/Profile*.java` |
-| 2 | Manual field-by-field mapper with a copy-paste bug that silently drops a field | `util/ProfileMapperUtil.java#toVO` |
-| 3 | Four near-duplicate repository lookup methods, only one of which got a security fix applied to it | `repository/ProfileRepository.java#getProfileById,getProfileByID,fetchProfileData,retrieveUserProfileInformationRecord` |
-| 4 | Unbounded static cache, never invalidated except on writes; cargo-cult `Thread.sleep` "fix" for a race that was never diagnosed | `repository/ProfileRepository.java#CACHE,waitForCacheToSettle` |
-| 5 | Interface + abstract base class + single implementation + unused factory, for one concrete service | `service/ProfileService.java`, `AbstractProfileServiceBase.java`, `ProfileServiceImpl.java`, `ProfileServiceFactory.java` |
-| 6 | Copy-pasted validation logic repeated per method, each copy subtly different (one drops a null check) | `service/ProfileServiceImpl.java#updateBio,updateAvatar,updateFavoriteColor` |
-| 7 | Boolean-flag-driven mega-dispatcher with a string-based if/else chain instead of polymorphism, including an `isAdmin \|\| skipValidation` fast path that skips validation entirely | `service/ProfileServiceImpl.java#doProfileStuff` |
-| 8 | Empty/near-empty catch blocks that silently swallow exceptions and still report success to the caller | `service/ProfileServiceImpl.java`, `controller/ProfileController.java` |
-| 9 | `println` debug logging of raw request bodies (which may contain the same fields other endpoints treat as sensitive) | `controller/ProfileController.java` |
-| 10 | Dead code: commented-out legacy method, an unused factory class, three interface methods that only ever throw `UnsupportedOperationException` | `service/ProfileServiceImpl.java`, `ProfileServiceFactory.java`, `AbstractProfileServiceBase.java` |
-| 11 | Constants-in-an-interface anti-pattern with meaningless magic numbers | `util/ProfileConstants.java` |
-| 12 | "Logger" that returns a meaningless boolean and grows an in-memory list forever | `util/ProfileActivityLogger.java` |
-| 13 | Duplicated view/edit HTML blocks instead of one templated form; inline `!important` CSS; inline JS built via string concatenation | `templates/profile.html` |
+| 2 | Four near-duplicate repository lookup methods implementing the same query | `repository/ProfileRepository.java#getProfileById,getProfileByID,fetchProfileData,retrieveUserProfileInformationRecord` |
+| 3 | Cargo-cult `Thread.sleep` "fix" for a race that was never diagnosed, left in place after the cache it guarded was fixed | `repository/ProfileRepository.java#waitForCacheToSettle` |
+| 4 | Interface + abstract base class + single implementation + unused factory, for one concrete service | `service/ProfileService.java`, `AbstractProfileServiceBase.java`, `ProfileServiceImpl.java`, `ProfileServiceFactory.java` |
+| 5 | Copy-pasted validation logic repeated per method, each copy subtly different (one drops a null check) | `service/ProfileServiceImpl.java#updateBio,updateAvatar,updateFavoriteColor` |
+| 6 | String-based if/else dispatcher instead of polymorphism for routing one of five actions | `service/ProfileServiceImpl.java#doProfileStuff` |
+| 7 | `println` debug logging of raw request bodies (which may contain the same fields other endpoints treat as sensitive) | `controller/ProfileController.java`, `service/ProfileServiceImpl.java` |
+| 8 | Dead code: an unused factory class, three interface methods that only ever throw `UnsupportedOperationException` | `ProfileServiceFactory.java`, `AbstractProfileServiceBase.java` |
+| 9 | Constants-in-an-interface anti-pattern with meaningless magic numbers | `util/ProfileConstants.java` |
+| 10 | "Logger" that returns a meaningless boolean and grows an in-memory list forever | `util/ProfileActivityLogger.java` |
+| 11 | Duplicated view/edit HTML blocks instead of one templated form; inline `!important` CSS; inline JS built via string concatenation | `templates/profile.html` |
+
+A few smells from the original version of this feature were fixed after an automated PR review caught them (see PR #1 history): the mapper dropping `avatarUrl`, a client-controlled `admin`/`skipValidation` query parameter that bypassed all validation, empty catch blocks that swallowed exceptions while still reporting success, a SQL-injectable duplicate lookup method, and a cache stored as a mutable `static` field written from instance methods. Those were genuine bugs/vulnerabilities rather than pure maintainability smells, so they were fixed rather than preserved.
 
 ## Running locally
 
