@@ -32,13 +32,12 @@ public class ProfileController {
 
     @GetMapping("/{username}")
     public ResponseEntity<ProfileDto> getProfile(@PathVariable String username) {
-        System.out.println("DEBUG: fetching profile for " + username);
         try {
             ProfileDto dto = profileService.getProfile(username);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
-            // something went wrong, but we don't want to 500 the frontend
-            return ResponseEntity.ok(null);
+            LOGGER.error("Failed to fetch profile for username={}", username, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
