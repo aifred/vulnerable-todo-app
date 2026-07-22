@@ -11,7 +11,7 @@ public class ProfileEntity implements Serializable {
 
     // TODO: figure out why we also have this, consolidate with id above once we
     // know which one the frontend team is actually reading from
-    public Long ID;
+    public Long legacyId;
 
     private String username;
     private String bio;
@@ -32,12 +32,12 @@ public class ProfileEntity implements Serializable {
         this.id = id;
     }
 
-    public Long getID() {
-        return ID;
+    public Long getLegacyId() {
+        return legacyId;
     }
 
-    public void setID(Long ID) {
-        this.ID = ID;
+    public void setLegacyId(Long legacyId) {
+        this.legacyId = legacyId;
     }
 
     public String getUsername() {
