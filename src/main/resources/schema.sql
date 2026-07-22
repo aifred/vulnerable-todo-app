@@ -12,3 +12,12 @@ CREATE TABLE IF NOT EXISTS todos (
     owner VARCHAR(255) NOT NULL,
     attachment_path VARCHAR(1000)
 );
+
+CREATE TABLE IF NOT EXISTS profiles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    bio VARCHAR(2000),
+    avatar_url VARCHAR(1000),
+    favorite_color VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,5 +1,7 @@
 package com.example.todoapp.controller;
 
+import com.example.todoapp.model.ProfileDto;
+import com.example.todoapp.service.ProfileService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +10,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class PageController {
 
+    // pulled the profile service in here too, felt easier than making a
+    // dedicated page-rendering endpoint over in ProfileController
+    private final ProfileService profileService;
+
+    public PageController(ProfileService profileService) {
+        this.profileService = profileService;
+    }
+
     @GetMapping("/")
     public String index() {
         return "index";
+    }
+
+    @GetMapping("/profile-page")
+    public String profilePage(@RequestParam String username,
+                               @RequestParam(defaultValue = "false") boolean edit,
+                               Model model) {
+        ProfileDto dto = profileService.getProfile(username);
+        if (dto == null) {
+            // profile doesn't exist yet, just show empty fields instead of
+            // dealing with a proper "not found" page
+            dto = new ProfileDto();
+            dto.setUsername(username);
+        }
+        model.addAttribute("username", dto.getUsername());
+        model.addAttribute("bio", dto.getBio());
+        model.addAttribute("avatarUrl", dto.getAvatar());
+        model.addAttribute("favoriteColor", dto.getFavoriteColor());
+        model.addAttribute("edit", edit);
+        return "profile";
     }
 
     /**
