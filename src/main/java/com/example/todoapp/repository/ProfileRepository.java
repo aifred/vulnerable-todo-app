@@ -1,6 +1,8 @@
 package com.example.todoapp.repository;
 
 import com.example.todoapp.model.ProfileEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,8 @@ import java.util.Map;
 
 @Repository
 public class ProfileRepository {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileRepository.class);
 
     private static final int MAX_CACHE_ENTRIES = 200;
 
@@ -114,8 +118,7 @@ public class ProfileRepository {
             cache.clear(); // easier than figuring out which keys are stale
             return entity;
         } catch (Exception e) {
-            // this should never happen in practice
-            e.printStackTrace();
+            LOGGER.error("Failed to save profile for username={}", entity.getUsername(), e);
             return null;
         }
     }

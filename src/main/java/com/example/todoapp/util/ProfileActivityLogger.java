@@ -8,7 +8,7 @@ import java.util.List;
 // matter (probably).
 public class ProfileActivityLogger {
 
-    public static final List<String> LOG = new ArrayList<>();
+    private static final List<String> LOG = new ArrayList<>();
 
     // returns a boolean for consistency with the rest of the codebase's
     // "everything returns something" convention. The return value doesn't

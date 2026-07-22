@@ -1,7 +1,6 @@
 package com.example.todoapp.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 // This class represents a user profile in the database.
 // It is the entity class for the profile feature.
@@ -18,12 +17,6 @@ public class ProfileEntity implements Serializable {
     private String bio;
     private String avatarUrl;
     private String favoriteColor;
-
-    // catch-all bucket for whatever extra stuff a feature needs later so we don't
-    // have to touch the schema again
-    public Object data;
-
-    private Date updatedAt;
 
     public ProfileEntity() {
         // default constructor, does nothing, required by frameworks
@@ -84,13 +77,5 @@ public class ProfileEntity implements Serializable {
     // so now there are two setters that do the exact same thing
     public void setFavouriteColor(String favoriteColour) {
         this.favoriteColor = favoriteColour;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
