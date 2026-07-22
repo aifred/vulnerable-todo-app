@@ -47,6 +47,7 @@ public class ProfileMapperUtil {
         ProfileVO vo = new ProfileVO();
         vo.username = entity.getUsername();
         vo.bio = entity.getBio();
+        vo.avatarUrl = entity.getAvatarUrl();
         vo.favoriteColor = entity.getFavoriteColor();
         return vo;
     }
