@@ -85,15 +85,26 @@ mvn clean verify sonar:sonar \
 
 ### 3. CI
 
-`.github/workflows/build.yml` only builds the project and runs tests with
-JaCoCo coverage — it does not call SonarQube. Run the `sonar:sonar` command
-above locally (or wire it into CI yourself) against whichever SonarQube
-server/token you're using.
+`.github/workflows/build.yml` builds the project, runs tests with JaCoCo
+coverage, and then analyzes the result against
+[SonarQube Cloud](https://sonarcloud.io) (organization `aifred`), waiting on
+and enforcing the Quality Gate. This runs automatically on every push and
+pull request targeting `main`.
+
+To enable it on a fork or a new clone of this repo, add one repository
+secret under **Settings → Secrets and variables → Actions → Secrets**:
+
+- `SONAR_TOKEN` — a SonarQube Cloud analysis token for the `aifred`
+  organization (generate one under **My Account → Security** on
+  sonarcloud.io).
+
+Without that secret, the `SonarQube analysis` step will fail authentication.
+The local Docker workflow above (steps 1–2) remains available for
+experimenting against a self-hosted server without touching CI at all.
 
 Given the density of intentional findings in this repo, expect the default
-Quality Gate to fail the first analysis if you do run it — that's the point:
-it demonstrates the gate actually blocking a real (if intentionally seeded)
-set of security issues.
+Quality Gate to fail analysis — that's the point: it demonstrates the gate
+actually blocking a real (if intentionally seeded) set of security issues.
 
 ## Project layout
 
