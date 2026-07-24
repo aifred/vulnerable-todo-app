@@ -19,6 +19,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <sonar.organization>aifred</sonar.organization>
         <sonar.projectKey>vulnerable-todo-app</sonar.projectKey>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.java.source>17</sonar.java.source>
@@ -77,10 +78,14 @@
                     </execution>
                     <execution>
                         <id>report</id>
-                        <phase>test</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
