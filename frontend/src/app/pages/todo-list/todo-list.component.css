@@ -1,0 +1,87 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.username {
+  margin-right: 12px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-form,
+.edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.grow {
+  flex: 1 1 200px;
+}
+
+.search-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.center-row {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.error-text {
+  color: #b3261e;
+}
+
+.empty-text {
+  color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.todo-card.done .todo-title {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.todo-text {
+  flex: 1 1 auto;
+}
+
+.todo-title {
+  font-weight: 500;
+}
+
+.todo-description {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.todo-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
