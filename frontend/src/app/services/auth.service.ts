@@ -4,6 +4,10 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Credentials, LoginResponse } from '../models/auth.model';
 
+// Prefer an HttpOnly, Secure, SameSite=strict cookie issued by the backend
+// so the token is never reachable from JavaScript. If client storage is
+// unavoidable, at minimum keep the token in memory (a signal) and avoid
+// persisting it to localStorage.
 const TOKEN_KEY = 'auth_token';
 const USERNAME_KEY = 'auth_username';
 
