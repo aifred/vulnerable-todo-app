@@ -58,7 +58,11 @@ public class TodoRepository {
         };
 
         jdbcTemplate.update(psc, keyHolder);
-        todo.setId(keyHolder.getKey().longValue());
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("Failed to retrieve generated id for todo");
+        }
+        todo.setId(key.longValue());
         return todo;
     }
 
