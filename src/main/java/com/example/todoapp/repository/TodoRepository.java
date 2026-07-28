@@ -2,9 +2,14 @@ package com.example.todoapp.repository;
 
 import com.example.todoapp.model.Todo;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -39,11 +44,25 @@ public class TodoRepository {
     }
 
     public Todo save(Todo todo) {
-        jdbcTemplate.update(
-                "INSERT INTO todos (title, description, done, owner, attachment_path) VALUES (?, ?, ?, ?, ?)",
-                todo.getTitle(), todo.getDescription(), todo.isDone(), todo.getOwner(), todo.getAttachmentPath());
-        Long newId = jdbcTemplate.queryForObject("CALL IDENTITY()", Long.class);
-        todo.setId(newId);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        PreparedStatementCreator psc = connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO todos (title, description, done, owner, attachment_path) VALUES (?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, todo.getTitle());
+            ps.setString(2, todo.getDescription());
+            ps.setBoolean(3, todo.isDone());
+            ps.setString(4, todo.getOwner());
+            ps.setString(5, todo.getAttachmentPath());
+            return ps;
+        };
+
+        jdbcTemplate.update(psc, keyHolder);
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalStateException("Failed to retrieve generated id for todo");
+        }
+        todo.setId(key.longValue());
         return todo;
     }
 
