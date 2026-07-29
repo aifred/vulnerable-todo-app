@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/api/files")
@@ -26,7 +27,11 @@ public class FileController {
      */
     @PostMapping("/upload")
     public ResponseEntity<String> upload(@RequestParam String filename, @RequestParam MultipartFile file) throws IOException {
+        Path uploadPath = new File(uploadDir).toPath().normalize();
         File dest = new File(uploadDir, filename);
+        if (!dest.toPath().normalize().startsWith(uploadPath)) {
+            throw new IOException("Entry is outside of the target directory");
+        }
         try (FileOutputStream out = new FileOutputStream(dest)) {
             out.write(file.getBytes());
         }
