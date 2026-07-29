@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/backup")
@@ -37,22 +38,39 @@ public class BackupController {
                 .body(bytes.toByteArray());
     }
 
-    /**
-     * VULNERABLE (CWE-502, Deserialization of Untrusted Data): ObjectInputStream.readObject
-     * is called directly on attacker-controlled bytes. If any gadget class with a
-     * dangerous readObject/readResolve is present on the classpath, this can be turned into
-     * remote code execution -- restoring a backup should never deserialize raw Java
-     * objects from an untrusted upload; use a safe data format (e.g. JSON) instead.
-     */
     @PostMapping("/restore")
     @SuppressWarnings("unchecked")
     public ResponseEntity<String> restore(@RequestParam MultipartFile file) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(file.getInputStream())) {
+        try (ObjectInputStream in = new SafeObjectInputStream(file.getInputStream())) {
             List<Todo> restored = (List<Todo>) in.readObject();
             for (Todo todo : restored) {
                 todoRepository.save(todo);
             }
         }
         return ResponseEntity.ok("restored");
+    }
+
+    private static class SafeObjectInputStream extends ObjectInputStream {
+
+        private static final Set<String> ALLOWED_CLASSES = Set.of(
+                java.util.ArrayList.class.getName(),
+                Todo.class.getName(),
+                java.lang.String.class.getName(),
+                java.lang.Long.class.getName(),
+                java.lang.Number.class.getName(),
+                java.lang.Boolean.class.getName()
+        );
+
+        SafeObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass osc) throws IOException, ClassNotFoundException {
+            if (!ALLOWED_CLASSES.contains(osc.getName())) {
+                throw new InvalidClassException("Unauthorized deserialization", osc.getName());
+            }
+            return super.resolveClass(osc);
+        }
     }
 }
