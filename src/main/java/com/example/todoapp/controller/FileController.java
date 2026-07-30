@@ -39,14 +39,19 @@ public class FileController {
     }
 
     /**
-     * VULNERABLE (CWE-22, Path Traversal): same unsanitized-filename issue as upload(),
-     * but on the read path, so a name such as "../../../../etc/passwd" discloses files
-     * outside the upload directory.
+     * Mitigates CWE-22 (Path Traversal) by normalizing the requested file path and
+     * rejecting filenames that resolve outside the configured upload directory before
+     * reading file contents.
      */
     @GetMapping("/download")
     public ResponseEntity<byte[]> download(@RequestParam String filename) throws IOException {
+        Path uploadPath = new File(uploadDir).toPath().normalize();
         File file = new File(uploadDir, filename);
-        byte[] content = Files.readAllBytes(file.toPath());
+        Path filePath = file.toPath().normalize();
+        if (!filePath.startsWith(uploadPath)) {
+            throw new IOException("Entry is outside of the target directory");
+        }
+        byte[] content = Files.readAllBytes(filePath);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(content);
