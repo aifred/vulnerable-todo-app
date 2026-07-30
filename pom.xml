@@ -11,7 +11,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>vulnerable-todo-app</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>vulnerable-todo-app</name>
     <description>Intentionally vulnerable to-do list application used as a test fixture for security tooling (SonarQube)</description>
 
