@@ -24,6 +24,7 @@ class TodoRepositoryTest {
     @BeforeEach
     void setUp() {
         repository = new TodoRepository(jdbcTemplate);
+        jdbcTemplate.update("DELETE FROM todos");
     }
 
     private Todo newTodo(String title, String description, String owner) {

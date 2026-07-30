@@ -15,14 +15,14 @@ SET @carol = 'carol';
 SET @dave  = 'dave';
 SET @admin = 'admin';
 
-MERGE INTO users (username, password_hash) VALUES
+MERGE INTO users (username, password_hash) KEY (username) VALUES
     (@alice, 'da33cca5a2625307f4b3d0a646dd59266f578297c8e08cb0c7b2801bda7e0441'),
     (@bob,   'caf7b270ca3e50485f9cc5370621a8079020f5e49cdfdafe0bdf0bc440ca7d99'),
     (@carol, 'c7879abe51ebbf5ecfa99253ae3b74aa0eec99322dbd800c2ecd7371aae73d4e'),
     (@dave,  'ffdf0edf01d200b29119c5d97357211bc51dd527076b5d711fbdc67fd69d0038'),
     (@admin, '2839f6a25fba96b20541b5cd7e56e809d4642dd8012d936fc9be20f13d9419e3');
 
-MERGE INTO profiles (username, bio, avatar_url, favorite_color) VALUES
+MERGE INTO profiles (username, bio, avatar_url, favorite_color) KEY (username) VALUES
     (@alice, 'Product manager who lives in spreadsheets and to-do lists.', 'https://i.pravatar.cc/150?u=alice', 'teal'),
     (@bob,   'Backend engineer. If it compiles, it ships.', 'https://i.pravatar.cc/150?u=bob', 'navy'),
     (@carol, 'Designer, plant parent, chronic list-maker.', 'https://i.pravatar.cc/150?u=carol', 'coral'),
