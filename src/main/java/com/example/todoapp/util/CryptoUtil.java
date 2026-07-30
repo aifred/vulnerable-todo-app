@@ -24,7 +24,7 @@ public final class CryptoUtil {
      */
     public static String hashPassword(String rawPassword) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest((rawPassword + HARDCODED_SECRET).getBytes());
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {

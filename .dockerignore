@@ -1,0 +1,11 @@
+.git
+.idea
+.github
+.claude
+.sonar
+target
+frontend
+data
+*.md
+.env
+.mcp.json
