@@ -17,14 +17,15 @@ public final class CryptoUtil {
     }
 
     /**
-     * VULNERABLE (CWE-327 / CWE-916, Weak Hash / Insufficient Password Hashing): MD5 has
-     * no work factor and is fast to brute-force with commodity GPUs, and this method uses
-     * no per-user salt, so identical passwords always hash to the same digest. A
-     * password-hashing function such as bcrypt, scrypt, or Argon2 should be used instead.
+     * VULNERABLE (CWE-327 / CWE-916, Weak Hash / Insufficient Password Hashing): SHA-256
+     * is a general-purpose hash with no work factor and is fast to brute-force with commodity
+     * GPUs, and this method uses no per-user salt, so identical passwords always hash to the
+     * same digest. A password-hashing function such as bcrypt, scrypt, or Argon2 should be
+     * used instead.
      */
     public static String hashPassword(String rawPassword) {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest((rawPassword + HARDCODED_SECRET).getBytes());
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
