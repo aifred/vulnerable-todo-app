@@ -18,6 +18,7 @@ public class ProfileDto {
     private String favoriteColor;
 
     public ProfileDto() {
+        // Default constructor required for DTO serialization/deserialization
     }
 
     public Long getId() {

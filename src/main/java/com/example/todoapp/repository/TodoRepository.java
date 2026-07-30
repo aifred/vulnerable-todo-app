@@ -83,8 +83,8 @@ public class TodoRepository {
      * lets an attacker read arbitrary tables through this "search my todos" feature.
      */
     public List<Todo> searchUnsafe(String owner, String keyword) {
-        String sql = "SELECT * FROM todos WHERE owner = '" + owner
-                + "' AND (title LIKE '%" + keyword + "%' OR description LIKE '%" + keyword + "%')";
-        return jdbcTemplate.query(sql, ROW_MAPPER);
+        String sql = "SELECT * FROM todos WHERE owner = ? AND (title LIKE ? OR description LIKE ?)";
+        String likeKeyword = "%" + keyword + "%";
+        return jdbcTemplate.query(sql, ROW_MAPPER, owner, likeKeyword, likeKeyword);
     }
 }
