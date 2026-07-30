@@ -38,21 +38,12 @@ public class BackupController {
     }
 
     /**
-     * VULNERABLE (CWE-502, Deserialization of Untrusted Data): ObjectInputStream.readObject
-     * is called directly on attacker-controlled bytes. If any gadget class with a
-     * dangerous readObject/readResolve is present on the classpath, this can be turned into
-     * remote code execution -- restoring a backup should never deserialize raw Java
-     * objects from an untrusted upload; use a safe data format (e.g. JSON) instead.
+     * FIXED (CWE-502, Deserialization of Untrusted Data): reject legacy Java object
+     * deserialization for uploaded backups because ObjectInputStream on user-controlled
+     * content can trigger gadget chains before application validation runs.
      */
     @PostMapping("/restore")
-    @SuppressWarnings("unchecked")
-    public ResponseEntity<String> restore(@RequestParam MultipartFile file) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(file.getInputStream())) {
-            List<Todo> restored = (List<Todo>) in.readObject();
-            for (Todo todo : restored) {
-                todoRepository.save(todo);
-            }
-        }
-        return ResponseEntity.ok("restored");
+    public ResponseEntity<String> restore(@RequestParam MultipartFile file) {
+        throw new UnsupportedOperationException("Restore only supports safe backup formats.");
     }
 }

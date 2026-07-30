@@ -31,12 +31,12 @@ public class UserRepository {
      * password hash, and "' OR '1'='1" returns every row in the table.
      */
     public User findByCredentialsUnsafe(String username, String passwordHash) {
-        String sql = "SELECT id, username, password_hash FROM users WHERE username = '"
-                + username + "' AND password_hash = '" + passwordHash + "'";
+        String sql = "SELECT id, username, password_hash FROM users WHERE username = ? AND password_hash = ?";
         List<User> matches = jdbcTemplate.query(sql, (ResultSet rs, int rowNum) -> new User(
-                rs.getLong("id"),
-                rs.getString("username"),
-                rs.getString("password_hash")));
+                        rs.getLong("id"),
+                        rs.getString("username"),
+                        rs.getString("password_hash")),
+                username, passwordHash);
         return matches.isEmpty() ? null : matches.get(0);
     }
 
