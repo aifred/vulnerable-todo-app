@@ -19,8 +19,10 @@
         <java.version>17</java.version>
         <!-- Overrides the Tomcat version managed by spring-boot-starter-parent 3.2.5 (10.1.20),
              which is affected by CVE-2025-24813 (fixed in 10.1.35). Setting the property keeps
-             every tomcat-embed-* / tomcat-* artifact on the same patched version. -->
-        <tomcat.version>10.1.56</tomcat.version>
+             every tomcat-embed-* / tomcat-* artifact on the same patched version.
+             10.1.57 (2026-07-07) is the newest released 10.1.x; it also clears CVE-2026-59083
+             and CVE-2026-59084, which affect 10.1.0-M1 to 10.1.56. -->
+        <tomcat.version>10.1.57</tomcat.version>
         <sonar.organization>aifred</sonar.organization>
         <sonar.projectKey>vulnerable-todo-app</sonar.projectKey>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
